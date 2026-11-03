@@ -50,6 +50,11 @@ let t=0;new MutationObserver(()=>{if(!t)t=setTimeout(()=>{t=0;fix();},30);}).obs
 inner = ('<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
          '<meta name="robots" content="noindex,nofollow"><title>Zu Fuss durch Japan</title></head><body>' + shim + page + "</body></html>")
 
+import hashlib
+digest = hashlib.sha256((inner + "|" + " ".join(assets) + "|" + (PW or "")).encode()).hexdigest()
+hp = os.path.join(OUT, ".build-hash")
+if os.path.exists(hp) and open(hp).read().strip() == digest and os.path.exists(os.path.join(OUT, "index.html")) and all(os.path.exists(os.path.join(OUT, "img", a + ".bin")) for a in assets):
+    print("unchanged: nothing to publish"); sys.exit(0)
 os.makedirs(os.path.join(OUT, "img"), exist_ok=True)
 for old in glob.glob(os.path.join(OUT, "img", "*.bin")):
     if os.path.basename(old)[:-4] not in assets: os.remove(old)
@@ -79,6 +84,7 @@ else:
     loader = open(os.path.join(HERE, "loader.html"), encoding="utf-8").read()
     loader = loader.replace("__SALT__", base64.b64encode(salt).decode()).replace("__ITER__", str(ITER)).replace("__BLOB__", blob)
     open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(loader)
+open(hp, "w").write(digest + "\n")
 open(os.path.join(OUT, "robots.txt"), "w").write("User-agent: *\nDisallow: /\n")
 open(os.path.join(OUT, ".nojekyll"), "w").write("")
 print("built", OUT, "photos", len(assets), "index", os.path.getsize(os.path.join(OUT, "index.html")))

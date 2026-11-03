@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Zu Fuss durch Japan</title>
+<style>
+:root { --bg: #EFEDE6; --sheet: #FAF8F2; --ink: #2B2622; --ink2: #6B635A; --shu: #B4432E; --line: #DDD6C8; }
+@media (prefers-color-scheme: dark) { :root { --bg: #1C1A18; --sheet: #26231F; --ink: #EDE7DC; --ink2: #A79E91; --shu: #D0664F; --line: #3A352F; } }
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+main { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+.card { width: 100%; max-width: 380px; background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 28px 24px 22px; text-align: center; }
+.seal { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 44px; padding: 6px 0; border-radius: 4px; background: var(--shu); color: #fff; font: 600 18px/1.15 "Hiragino Mincho ProN", "Yu Mincho", serif; transform: rotate(-3deg); margin-bottom: 14px; }
+h1 { font: 600 22px/1.25 Georgia, "Times New Roman", serif; margin: 0 0 6px; }
+p { margin: 0 0 18px; color: var(--ink2); font-size: 14.5px; }
+input { width: 100%; font: inherit; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+input:focus { outline: 2px solid var(--shu); outline-offset: 1px; }
+label.rem { display: flex; gap: 8px; align-items: center; justify-content: center; font-size: 13.5px; color: var(--ink2); margin: 12px 0 16px; }
+button { width: 100%; font: 600 15px/1 inherit; font-family: inherit; padding: 12px; border: 0; border-radius: 999px; background: var(--shu); color: #fff; cursor: pointer; }
+button[disabled] { opacity: .6; }
+.err { color: var(--shu); font-size: 13.5px; min-height: 20px; margin: 10px 0 0; }
+.lang { margin-top: 14px; font-size: 12.5px; color: var(--ink2); }
+.lang a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <form class="card" id="f" autocomplete="on">
+    <div class="seal" aria-hidden="true">旅<br>日<br>記</div>
+    <h1 id="h">Zu Fuss durch Japan</h1>
+    <p id="lead">Diese Seite ist privat. Gib das Passwort ein, das du bekommen hast.</p>
+    <input id="pw" type="password" autocomplete="current-password" aria-label="Passwort" placeholder="Passwort" required>
+    <label class="rem"><input id="rem" type="checkbox" checked style="width:auto"> <span id="remt">Auf diesem Gerät merken</span></label>
+    <button id="go" type="submit">Öffnen</button>
+    <div class="err" id="err" role="alert"></div>
+    <div class="lang"><a href="#" id="en">English</a></div>
+  </form>
+</main>
+<script>
+(function () {
+  const SALT = "__SALT__", ITER = __ITER__, BLOB = "__BLOB__";
+  const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  const T = { de: ["Zu Fuss durch Japan", "Diese Seite ist privat. Gib das Passwort ein, das du bekommen hast.", "Passwort", "Auf diesem Gerät merken", "Öffnen", "Das Passwort stimmt nicht.", "English", "Wird geöffnet…"],
+              en: ["Walking across Japan", "This page is private. Enter the password you were given.", "Password", "Remember on this device", "Open", "That password isn't right.", "Deutsch", "Opening…"] };
+  let lang = "de";
+  const $ = (id) => document.getElementById(id);
+  function setLang(l) { lang = l; const t = T[l]; $("h").textContent = t[0]; $("lead").textContent = t[1]; $("pw").placeholder = t[2]; $("pw").setAttribute("aria-label", t[2]); $("remt").textContent = t[3]; $("go").textContent = t[4]; $("en").textContent = t[6]; document.documentElement.lang = l; }
+  $("en").addEventListener("click", (e) => { e.preventDefault(); setLang(lang === "de" ? "en" : "de"); });
+  async function keyFrom(pw) {
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);
+    return crypto.subtle.deriveKey({ name: "PBKDF2", salt: b64(SALT), iterations: ITER, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, true, ["decrypt"]);
+  }
+  async function open(key) {
+    const all = b64(BLOB);
+    const gz = await crypto.subtle.decrypt({ name: "AES-GCM", iv: all.slice(0, 12) }, key, all.slice(12));
+    const html = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+    window.__KEY = key;
+    document.open(); document.write(html); document.close();
+  }
+  async function tryKey(key, remember) {
+    await open(key);
+    if (remember) { try { localStorage.setItem("jw-key", JSON.stringify(await crypto.subtle.exportKey("jwk", key))); } catch {} }
+  }
+  // a link like …/#k=PASSWORD opens directly; the password is then removed from the address bar
+  const hk = new URLSearchParams(location.hash.slice(1)).get("k");
+  if (hk) history.replaceState(null, "", location.pathname + location.search);
+  (async () => {
+    try { const j = localStorage.getItem("jw-key"); if (j) { const k = await crypto.subtle.importKey("jwk", JSON.parse(j), { name: "AES-GCM" }, true, ["decrypt"]); return await tryKey(k, false); } } catch { try { localStorage.removeItem("jw-key"); } catch {} }
+    if (hk) { try { return await tryKey(await keyFrom(hk), true); } catch {} }
+    $("pw").focus();
+  })();
+  $("f").addEventListener("submit", async (e) => {
+    e.preventDefault(); $("err").textContent = ""; $("go").disabled = true; $("go").textContent = T[lang][7];
+    try { await tryKey(await keyFrom($("pw").value), $("rem").checked); }
+    catch { $("err").textContent = T[lang][5]; $("go").disabled = false; $("go").textContent = T[lang][4]; $("pw").select(); }
+  });
+})();
+</script>
+</body>
+</html>

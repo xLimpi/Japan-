@@ -14,10 +14,16 @@ html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--in
 main { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
 .card { width: 100%; max-width: 380px; background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 28px 24px 22px; text-align: center; }
 .seal { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 44px; padding: 6px 0; border-radius: 4px; background: var(--shu); color: #fff; font: 600 18px/1.15 "Hiragino Mincho ProN", "Yu Mincho", serif; transform: rotate(-3deg); margin-bottom: 14px; }
-.neko { width: 132px; height: auto; display: block; margin: -6px auto 8px; overflow: visible; }
-.neko .wave { transform-origin: 106px 104px; animation: wave 2.6s ease-in-out infinite; }
+.neko { width: 100%; max-width: 300px; height: auto; display: block; margin: -4px auto 14px; border-radius: 12px; }
+.neko .wave { transform-origin: 106px 104px; transform-box: view-box; animation: wave 2.6s ease-in-out infinite; }
 @keyframes wave { 0%, 55%, 100% { transform: rotate(0deg); } 65% { transform: rotate(-16deg); } 75% { transform: rotate(4deg); } 85% { transform: rotate(-12deg); } }
 @media (prefers-reduced-motion: reduce) { .neko .wave { animation: none; } }
+.neko .sky { fill: #F3E6D3; } .neko .sun { fill: #E9A27E; opacity: .75; } .neko .far { fill: #B9C3CC; } .neko .snow { fill: #FAF8F2; }
+.neko .hill { fill: #C9D1B4; } .neko .hill2 { fill: #A9B98F; } .neko .road { fill: #E8D9BA; } .neko .trunk { stroke: #7A5236; stroke-width: 3; }
+.neko .pine { fill: #43624A; } .neko .stone { fill: #B9B1A2; stroke: #8E877B; stroke-width: 1.2; } .neko .stone-t { font: 600 9px serif; fill: #5E574D; }
+.neko .ban { font: 600 10.5px "Hiragino Mincho ProN", "Yu Mincho", serif; fill: #FAF4E6; }
+@media (prefers-color-scheme: dark) { .neko .sky { fill: #2F3A4A; } .neko .sun { fill: #EBDDB0; opacity: .85; } .neko .far { fill: #4E5D6E; } .neko .snow { fill: #DDE4EA; }
+  .neko .hill { fill: #3D4A3C; } .neko .hill2 { fill: #4E5E47; } .neko .road { fill: #8A7B62; } .neko .pine { fill: #26392B; } .neko .stone { fill: #7E776B; } .neko .stone-t { fill: #2B2622; } }
 h1 { font: 600 22px/1.25 Georgia, "Times New Roman", serif; margin: 0 0 6px; }
 p { margin: 0 0 18px; color: var(--ink2); font-size: 14.5px; }
 input { width: 100%; font: inherit; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
@@ -33,53 +39,90 @@ button[disabled] { opacity: .6; }
 <body>
 <main>
   <form class="card" id="f" autocomplete="on">
-    <svg class="neko" id="neko" viewBox="0 0 160 170" role="img" aria-label="Maneki-neko, die winkende Glückskatze">
+    <svg class="neko" id="neko" viewBox="0 0 240 196" role="img" aria-label="Maneki-neko als Wanderer auf der Strasse">
       <defs>
         <radialGradient id="nk-b" cx="45%" cy="35%" r="75%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#EFE8DC"/></radialGradient>
         <linearGradient id="nk-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4CF6A"/><stop offset="1" stop-color="#D49A2A"/></linearGradient>
+        <linearGradient id="nk-hat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9CB86"/><stop offset="1" stop-color="#C9A257"/></linearGradient>
+        <clipPath id="nk-scene"><rect x="0" y="0" width="240" height="196" rx="14"/></clipPath>
       </defs>
-      <ellipse cx="80" cy="162" rx="50" ry="6" fill="var(--ink)" opacity=".08"/>
-      <!-- waving right paw (behind the head) -->
-      <g class="wave">
-        <path d="M96 106 C98 88 104 72 111 60 C116 50 133 50 134 61 C135 72 128 88 120 106 Z" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2.2" stroke-linejoin="round"/>
-        <path d="M116 57 q1.5 -4.5 5 -3 M122.5 55.5 q2.5 -4 5.5 -1.5 M128.5 57 q3 -2.5 4.5 1" fill="none" stroke="#2B2622" stroke-width="1.5" stroke-linecap="round"/>
-        <ellipse cx="124" cy="64" rx="4.5" ry="3.4" fill="#F2A7A0"/>
+      <g clip-path="url(#nk-scene)">
+        <rect width="240" height="196" class="sky"/>
+        <circle cx="196" cy="44" r="13" class="sun"/>
+        <path d="M150 122 L184 74 L218 122 Z" class="far"/>
+        <path d="M174 88 L184 74 L194 88 L189 86 L184 90 L179 86 Z" class="snow"/>
+        <path d="M0 124 C40 104 80 108 120 118 C160 128 200 110 240 116 L240 196 L0 196 Z" class="hill"/>
+        <path d="M0 146 C50 132 100 138 140 146 C180 154 210 140 240 142 L240 196 L0 196 Z" class="hill2"/>
+        <path d="M86 196 C98 170 140 164 132 146 C126 134 104 128 84 122 L90 121 C112 126 136 132 142 146 C152 166 122 178 154 196 Z" class="road"/>
+        <!-- pine -->
+        <path d="M206 150 v-18" class="trunk"/>
+        <path d="M192 140 q14 -10 28 0 q-14 -4 -28 0 Z M195 132 q11 -9 22 0 q-11 -3 -22 0 Z M199 125 q7 -6 14 0 q-7 -2 -14 0 Z" class="pine"/>
+        <!-- stone road marker -->
+        <path d="M26 166 v-30 q0 -6 7 -6 q7 0 7 6 v30 Z" class="stone"/>
+        <text x="33" y="148" class="stone-t" text-anchor="middle">道</text>
+        <text x="33" y="159" class="stone-t" text-anchor="middle">標</text>
       </g>
-      <!-- body -->
-      <path d="M38 158 C30 128 36 100 52 88 L108 88 C124 100 130 128 122 158 Z" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2.2" stroke-linejoin="round"/>
-      <!-- tail -->
-      <path d="M116 150 C136 148 143 133 134 121" fill="none" stroke="#2B2622" stroke-width="9" stroke-linecap="round"/>
-      <path d="M116 150 C136 148 143 133 134 121" fill="none" stroke="#F4EEE4" stroke-width="5" stroke-linecap="round"/>
-      <path d="M137 128 C140 125 138 121 134 121" fill="none" stroke="#D98B3C" stroke-width="5" stroke-linecap="round"/>
-      <!-- belly bib -->
-      <path d="M58 112 C62 140 98 140 102 112" fill="#F6EFE4" stroke="none"/>
-      <!-- left paw holding koban -->
-      <g>
-        <ellipse cx="62" cy="134" rx="15" ry="20" fill="url(#nk-g)" stroke="#8A5A12" stroke-width="1.8" transform="rotate(-12 62 134)"/>
-        <path d="M54 128 h16 M53 134 h18 M54 140 h16" stroke="#8A5A12" stroke-width="1.2" stroke-linecap="round" transform="rotate(-12 62 134)"/>
-        <text x="62" y="137" font-size="8" font-family="serif" fill="#7A4E0E" text-anchor="middle" transform="rotate(-12 62 134)">千万両</text>
-        <path d="M50 146 c4 6 12 7 18 3" fill="#FFFFFF" stroke="#2B2622" stroke-width="2" stroke-linecap="round"/>
+      <ellipse cx="120" cy="184" rx="40" ry="5" fill="#000" opacity=".12"/>
+      <g transform="translate(56 50) scale(.8)">
+        <!-- tail -->
+        <path d="M116 150 C136 148 143 133 134 121" fill="none" stroke="#2B2622" stroke-width="9" stroke-linecap="round"/>
+        <path d="M116 150 C136 148 143 133 134 121" fill="none" stroke="#F4EEE4" stroke-width="5" stroke-linecap="round"/>
+        <path d="M137 128 C140 125 138 121 134 121" fill="none" stroke="#D98B3C" stroke-width="5" stroke-linecap="round"/>
+        <!-- waving right paw (behind) -->
+        <g class="wave">
+          <path d="M96 106 C98 88 104 72 111 60 C116 50 133 50 134 61 C135 72 128 88 120 106 Z" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2.2" stroke-linejoin="round"/>
+          <path d="M116 57 q1.5 -4.5 5 -3 M122.5 55.5 q2.5 -4 5.5 -1.5 M128.5 57 q3 -2.5 4.5 1" fill="none" stroke="#2B2622" stroke-width="1.5" stroke-linecap="round"/>
+          <ellipse cx="124" cy="64" rx="4.5" ry="3.4" fill="#F2A7A0"/>
+        </g>
+        <!-- body -->
+        <path d="M38 158 C30 128 36 100 52 88 L108 88 C124 100 130 128 122 158 Z" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M58 112 C62 140 98 140 102 112" fill="#F6EFE4"/>
+        <!-- little furoshiki bundle on the hip -->
+        <path d="M86 132 q14 -6 26 2 q2 14 -12 18 q-16 2 -16 -12 Z" fill="#3C6890" stroke="#2B2622" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M92 138 q4 3 8 0 M100 141 q4 3 8 0 M93 146 q4 3 8 0" fill="none" stroke="#DCE6EE" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M95 131 q3 -7 8 -1" fill="none" stroke="#2B2622" stroke-width="1.8" stroke-linecap="round"/>
+        <!-- head -->
+        <path d="M40 54 L44 22 L66 36 C74 33 86 33 94 36 L116 22 L120 54 C124 76 108 92 80 92 C52 92 36 76 40 54 Z" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M92 37 C100 35 112 41 116 52 C108 50 98 46 92 37 Z" fill="#D98B3C" opacity=".9"/>
+        <path d="M44 50 C46 42 52 38 60 38 C56 44 50 48 44 50 Z" fill="#3A332D" opacity=".85"/>
+        <!-- sugegasa straw hat, ears poking through -->
+        <path d="M22 40 C40 4 120 4 138 40 C110 48 50 48 22 40 Z" fill="url(#nk-hat)" stroke="#7A5236" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M44 36 C58 20 102 20 116 36 M60 38 C68 18 92 18 100 38 M80 40 L80 14" fill="none" stroke="#9C7A3C" stroke-width="1" opacity=".7"/>
+        <path d="M46 30 L44 12 L60 26 Z" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M48 26 L47 17 L55 24 Z" fill="#F2A7A0"/>
+        <path d="M114 30 L116 12 L100 26 Z" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M112 26 L113 17 L105 24 Z" fill="#F2A7A0"/>
+        <path d="M42 44 C42 60 46 74 54 84 M118 44 C118 60 114 74 106 84" fill="none" stroke="#9C7A3C" stroke-width="1.4" opacity=".8"/>
+        <!-- face -->
+        <path d="M58 62 q6 -6 12 0" fill="none" stroke="#2B2622" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M90 62 q6 -6 12 0" fill="none" stroke="#2B2622" stroke-width="2.4" stroke-linecap="round"/>
+        <ellipse cx="56" cy="72" rx="6" ry="3.5" fill="#F2A7A0" opacity=".7"/>
+        <ellipse cx="104" cy="72" rx="6" ry="3.5" fill="#F2A7A0" opacity=".7"/>
+        <path d="M77 68 h6 l-3 3.5 Z" fill="#C9605A"/>
+        <path d="M80 72 q-3 5 -7 3 M80 72 q3 5 7 3" fill="none" stroke="#2B2622" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M40 66 l14 3 M40 74 l14 -1 M120 66 l-14 3 M120 74 l-14 -1" stroke="#2B2622" stroke-width="1.3" stroke-linecap="round" opacity=".7"/>
+        <!-- collar and bell -->
+        <path d="M50 88 C66 98 94 98 110 88" fill="none" stroke="#B4432E" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="80" cy="101" r="7.5" fill="url(#nk-g)" stroke="#8A5A12" stroke-width="1.6"/>
+        <path d="M73 100 h14" stroke="#8A5A12" stroke-width="1.2"/>
+        <circle cx="80" cy="104.5" r="1.6" fill="#8A5A12"/>
+        <!-- walking stick with nobori banner, held in front -->
+        <g class="stick">
+          <path d="M34 174 L44 -10" stroke="#2B2622" stroke-width="7.5" stroke-linecap="round"/>
+          <path d="M34 174 L44 -10" stroke="#8A5E3C" stroke-width="4.5" stroke-linecap="round"/>
+          <path d="M14 -6 L48 -6" stroke="#2B2622" stroke-width="5.5" stroke-linecap="round"/>
+          <path d="M14 -6 L48 -6" stroke="#8A5E3C" stroke-width="3" stroke-linecap="round"/>
+          <path d="M16 -4 L40 -4 L40 58 L28 50 L16 58 Z" fill="#B4432E" stroke="#2B2622" stroke-width="1.8" stroke-linejoin="round"/>
+          <text x="28" y="10" class="ban" text-anchor="middle">千</text>
+          <text x="28" y="23" class="ban" text-anchor="middle">里</text>
+          <text x="28" y="35" class="ban" text-anchor="middle">の</text>
+          <text x="28" y="47" class="ban" text-anchor="middle">道</text>
+        </g>
+        <!-- paw gripping the stick -->
+        <ellipse cx="42" cy="124" rx="10" ry="9" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2.2"/>
+        <path d="M36 120 q-2 4 0 8 M41 118 q-2 5 0 11" fill="none" stroke="#2B2622" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M50 114 C48 122 46 126 50 132" fill="none" stroke="#2B2622" stroke-width="2.2" stroke-linecap="round"/>
       </g>
-      <!-- head -->
-      <path d="M40 54 L44 18 L66 36 C74 33 86 33 94 36 L116 18 L120 54 C124 76 108 92 80 92 C52 92 36 76 40 54 Z" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2.2" stroke-linejoin="round"/>
-      <path d="M47 26 L50 44 L62 38 Z" fill="#F2A7A0"/>
-      <path d="M113 26 L110 44 L98 38 Z" fill="#F2A7A0"/>
-      <!-- calico patches -->
-      <path d="M92 36 C100 34 112 40 116 52 C108 50 98 46 92 36 Z" fill="#D98B3C" opacity=".9"/>
-      <path d="M44 48 C46 40 52 36 60 36 C56 42 50 46 44 48 Z" fill="#3A332D" opacity=".85"/>
-      <!-- face -->
-      <path d="M58 60 q6 -6 12 0" fill="none" stroke="#2B2622" stroke-width="2.4" stroke-linecap="round"/>
-      <path d="M90 60 q6 -6 12 0" fill="none" stroke="#2B2622" stroke-width="2.4" stroke-linecap="round"/>
-      <ellipse cx="56" cy="70" rx="6" ry="3.5" fill="#F2A7A0" opacity=".7"/>
-      <ellipse cx="104" cy="70" rx="6" ry="3.5" fill="#F2A7A0" opacity=".7"/>
-      <path d="M77 66 h6 l-3 3.5 Z" fill="#C9605A"/>
-      <path d="M80 70 q-3 5 -7 3 M80 70 q3 5 7 3" fill="none" stroke="#2B2622" stroke-width="1.8" stroke-linecap="round"/>
-      <path d="M40 64 l14 3 M40 72 l14 -1 M120 64 l-14 3 M120 72 l-14 -1" stroke="#2B2622" stroke-width="1.3" stroke-linecap="round" opacity=".7"/>
-      <!-- collar and bell -->
-      <path d="M50 86 C66 96 94 96 110 86" fill="none" stroke="#B4432E" stroke-width="7" stroke-linecap="round"/>
-      <circle cx="80" cy="99" r="7.5" fill="url(#nk-g)" stroke="#8A5A12" stroke-width="1.6"/>
-      <path d="M73 98 h14" stroke="#8A5A12" stroke-width="1.2"/>
-      <circle cx="80" cy="102.5" r="1.6" fill="#8A5A12"/>
     </svg>
     <h1 id="h">Zu Fuss durch Japan</h1>
     <p id="lead">Diese Seite ist privat. Gib das Passwort ein, das du bekommen hast.</p>
@@ -98,7 +141,7 @@ button[disabled] { opacity: .6; }
               en: ["Walking across Japan", "This page is private. Enter the password you were given.", "Password", "Remember on this device", "Open", "That password isn't right.", "Deutsch", "Opening…"] };
   let lang = "de";
   const $ = (id) => document.getElementById(id);
-  function setLang(l) { lang = l; const t = T[l]; $("h").textContent = t[0]; $("lead").textContent = t[1]; $("pw").placeholder = t[2]; $("pw").setAttribute("aria-label", t[2]); $("remt").textContent = t[3]; $("go").textContent = t[4]; $("en").textContent = t[6]; $("neko").setAttribute("aria-label", l === "de" ? "Maneki-neko, die winkende Glückskatze" : "Maneki-neko, the beckoning lucky cat"); document.documentElement.lang = l; }
+  function setLang(l) { lang = l; const t = T[l]; $("h").textContent = t[0]; $("lead").textContent = t[1]; $("pw").placeholder = t[2]; $("pw").setAttribute("aria-label", t[2]); $("remt").textContent = t[3]; $("go").textContent = t[4]; $("en").textContent = t[6]; $("neko").setAttribute("aria-label", l === "de" ? "Maneki-neko als Wanderer auf der Strasse" : "Maneki-neko as a traveller on the road"); document.documentElement.lang = l; }
   $("en").addEventListener("click", (e) => { e.preventDefault(); setLang(lang === "de" ? "en" : "de"); });
   async function keyFrom(pw) {
     const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);

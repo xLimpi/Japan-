@@ -6,16 +6,22 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
 <title>Zu Fuss durch Japan</title>
+<script>try { const t = localStorage.getItem("jw-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}</script>
 <style>
 :root { --bg: #F1E8D8; --sheet: #FDF5E8; --ink: #2B2622; --ink2: #6B635A; --shu: #B4432E; --line: #DDD6C8; }
-@media (prefers-color-scheme: dark) { :root { --bg: #1C1A18; --sheet: #26231F; --ink: #EDE7DC; --ink2: #A79E91; --shu: #D0664F; --line: #3A352F; } }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #1C1A18; --sheet: #26231F; --ink: #EDE7DC; --ink2: #A79E91; --shu: #D0664F; --line: #3A352F; } }
+:root[data-theme="dark"] { --bg: #1C1A18; --sheet: #26231F; --ink: #EDE7DC; --ink2: #A79E91; --shu: #D0664F; --line: #3A352F; }
 * { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
-main { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+main { min-height: 100vh; display: grid; place-items: center; padding: 64px 16px 24px; }
 .card { width: 100%; max-width: 400px; background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 28px 24px 22px; text-align: center; }
 .neko { display: block; width: calc(100% + 24px); height: auto; aspect-ratio: 1200 / 1000; margin: -14px -12px 6px; object-fit: cover;
   -webkit-mask-image: radial-gradient(ellipse 72% 70% at 50% 50%, #000 58%, transparent 100%); mask-image: radial-gradient(ellipse 72% 70% at 50% 50%, #000 58%, transparent 100%); }
-@media (prefers-color-scheme: dark) { .neko { -webkit-mask-image: none; mask-image: none; width: 100%; margin: -6px 0 16px; border-radius: 8px; filter: brightness(.94); box-shadow: 0 0 0 1px var(--line); } }
+.neko.night { display: none; -webkit-mask-image: radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%); mask-image: radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .neko.day { display: none; } :root:not([data-theme="light"]) .neko.night { display: block; } }
+:root[data-theme="dark"] .neko.day { display: none; } :root[data-theme="dark"] .neko.night { display: block; }
+.themetog { position: fixed; top: max(12px, env(safe-area-inset-top)); right: 12px; width: 38px; height: 38px; padding: 0; border-radius: 999px; border: 1px solid var(--line); background: var(--sheet); color: var(--ink); font-size: 17px; line-height: 1; display: grid; place-items: center; cursor: pointer; z-index: 2; }
+.themetog:focus-visible { outline: 2px solid var(--shu); outline-offset: 2px; }
 h1 { font: 600 22px/1.25 Georgia, "Times New Roman", serif; margin: 0 0 6px; }
 p { margin: 0 0 18px; color: var(--ink2); font-size: 14.5px; }
 input { width: 100%; font: inherit; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
@@ -29,11 +35,16 @@ button[disabled] { opacity: .6; }
 </style>
 </head>
 <body>
+<button type="button" class="themetog" id="themetog" aria-label="Zum dunklen Modus wechseln" title="Hell / Dunkel"><span aria-hidden="true">☾</span></button>
 <main>
   <form class="card" id="f" autocomplete="on">
     <picture>
       <source type="image/webp" srcset="login-640.webp 640w, login-1200.webp 1200w" sizes="(max-width: 440px) 92vw, 400px">
-      <img class="neko" id="neko" src="login-1200.jpg" width="1200" height="1000" alt="Maneki-neko als Wanderer auf der Strasse, mit Strohhut, Wanderstab und Banner «千里の道», dahinter der Fuji">
+      <img class="neko day" id="neko" src="login-1200.jpg" width="1200" height="1000" alt="Maneki-neko als Wanderer auf der Strasse, mit Strohhut, Wanderstab und Banner «千里の道», dahinter der Fuji">
+    </picture>
+    <picture>
+      <source type="image/webp" srcset="login-night-640.webp 640w, login-night-1200.webp 1200w" sizes="(max-width: 440px) 92vw, 400px">
+      <img class="neko night" id="nekoN" src="login-night-1200.jpg" width="1200" height="1000" loading="lazy" alt="Dieselbe Szene bei Nacht, unter dem Vollmond">
     </picture>
     <h1 id="h">Zu Fuss durch Japan</h1>
     <p id="lead">Diese Seite ist privat. Gib das Passwort ein, das du bekommen hast.</p>
@@ -52,7 +63,12 @@ button[disabled] { opacity: .6; }
               en: ["Walking across Japan", "This page is private. Enter the password you were given.", "Password", "Remember on this device", "Open", "That password isn't right.", "Deutsch", "Opening…"] };
   let lang = "de";
   const $ = (id) => document.getElementById(id);
-  function setLang(l) { lang = l; const t = T[l]; $("h").textContent = t[0]; $("lead").textContent = t[1]; $("pw").placeholder = t[2]; $("pw").setAttribute("aria-label", t[2]); $("remt").textContent = t[3]; $("go").textContent = t[4]; $("en").textContent = t[6]; $("neko").alt = l === "de" ? "Maneki-neko als Wanderer auf der Strasse, mit Strohhut, Wanderstab und Banner «千里の道», dahinter der Fuji" : "Maneki-neko as a traveller on the road, with straw hat, walking stick and a 千里の道 banner, Mount Fuji behind"; document.documentElement.lang = l; }
+  function setLang(l) { lang = l; const t = T[l]; $("h").textContent = t[0]; $("lead").textContent = t[1]; $("pw").placeholder = t[2]; $("pw").setAttribute("aria-label", t[2]); $("remt").textContent = t[3]; $("go").textContent = t[4]; $("en").textContent = t[6]; $("neko").alt = l === "de" ? "Maneki-neko als Wanderer auf der Strasse, mit Strohhut, Wanderstab und Banner «千里の道», dahinter der Fuji" : "Maneki-neko as a traveller on the road, with straw hat, walking stick and a 千里の道 banner, Mount Fuji behind"; document.documentElement.lang = l; $("nekoN").alt = l === "de" ? "Dieselbe Szene bei Nacht, unter dem Vollmond" : "The same scene at night, under the full moon"; themeBtn(); }
+  const isDark = () => { const t = document.documentElement.dataset.theme; return t === "dark" || (t !== "light" && matchMedia("(prefers-color-scheme: dark)").matches); };
+  function themeBtn() { const d = isDark(); $("themetog").firstElementChild.textContent = d ? "☀︎" : "☾"; $("themetog").setAttribute("aria-label", d ? (lang === "de" ? "Zum hellen Modus wechseln" : "Switch to light mode") : (lang === "de" ? "Zum dunklen Modus wechseln" : "Switch to dark mode")); }
+  $("themetog").addEventListener("click", () => { const n = isDark() ? "light" : "dark"; document.documentElement.dataset.theme = n; try { localStorage.setItem("jw-theme", n); } catch {} themeBtn(); });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", themeBtn);
+  themeBtn();
   $("en").addEventListener("click", (e) => { e.preventDefault(); setLang(lang === "de" ? "en" : "de"); });
   async function keyFrom(pw) {
     const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);

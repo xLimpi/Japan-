@@ -14,6 +14,10 @@ html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--in
 main { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
 .card { width: 100%; max-width: 380px; background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 28px 24px 22px; text-align: center; }
 .seal { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 44px; padding: 6px 0; border-radius: 4px; background: var(--shu); color: #fff; font: 600 18px/1.15 "Hiragino Mincho ProN", "Yu Mincho", serif; transform: rotate(-3deg); margin-bottom: 14px; }
+.neko { width: 132px; height: auto; display: block; margin: -6px auto 8px; overflow: visible; }
+.neko .wave { transform-origin: 106px 104px; animation: wave 2.6s ease-in-out infinite; }
+@keyframes wave { 0%, 55%, 100% { transform: rotate(0deg); } 65% { transform: rotate(-16deg); } 75% { transform: rotate(4deg); } 85% { transform: rotate(-12deg); } }
+@media (prefers-reduced-motion: reduce) { .neko .wave { animation: none; } }
 h1 { font: 600 22px/1.25 Georgia, "Times New Roman", serif; margin: 0 0 6px; }
 p { margin: 0 0 18px; color: var(--ink2); font-size: 14.5px; }
 input { width: 100%; font: inherit; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
@@ -29,7 +33,54 @@ button[disabled] { opacity: .6; }
 <body>
 <main>
   <form class="card" id="f" autocomplete="on">
-    <div class="seal" aria-hidden="true">旅<br>日<br>記</div>
+    <svg class="neko" id="neko" viewBox="0 0 160 170" role="img" aria-label="Maneki-neko, die winkende Glückskatze">
+      <defs>
+        <radialGradient id="nk-b" cx="45%" cy="35%" r="75%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#EFE8DC"/></radialGradient>
+        <linearGradient id="nk-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4CF6A"/><stop offset="1" stop-color="#D49A2A"/></linearGradient>
+      </defs>
+      <ellipse cx="80" cy="162" rx="50" ry="6" fill="var(--ink)" opacity=".08"/>
+      <!-- waving right paw (behind the head) -->
+      <g class="wave">
+        <path d="M96 106 C98 88 104 72 111 60 C116 50 133 50 134 61 C135 72 128 88 120 106 Z" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M116 57 q1.5 -4.5 5 -3 M122.5 55.5 q2.5 -4 5.5 -1.5 M128.5 57 q3 -2.5 4.5 1" fill="none" stroke="#2B2622" stroke-width="1.5" stroke-linecap="round"/>
+        <ellipse cx="124" cy="64" rx="4.5" ry="3.4" fill="#F2A7A0"/>
+      </g>
+      <!-- body -->
+      <path d="M38 158 C30 128 36 100 52 88 L108 88 C124 100 130 128 122 158 Z" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2.2" stroke-linejoin="round"/>
+      <!-- tail -->
+      <path d="M116 150 C136 148 143 133 134 121" fill="none" stroke="#2B2622" stroke-width="9" stroke-linecap="round"/>
+      <path d="M116 150 C136 148 143 133 134 121" fill="none" stroke="#F4EEE4" stroke-width="5" stroke-linecap="round"/>
+      <path d="M137 128 C140 125 138 121 134 121" fill="none" stroke="#D98B3C" stroke-width="5" stroke-linecap="round"/>
+      <!-- belly bib -->
+      <path d="M58 112 C62 140 98 140 102 112" fill="#F6EFE4" stroke="none"/>
+      <!-- left paw holding koban -->
+      <g>
+        <ellipse cx="62" cy="134" rx="15" ry="20" fill="url(#nk-g)" stroke="#8A5A12" stroke-width="1.8" transform="rotate(-12 62 134)"/>
+        <path d="M54 128 h16 M53 134 h18 M54 140 h16" stroke="#8A5A12" stroke-width="1.2" stroke-linecap="round" transform="rotate(-12 62 134)"/>
+        <text x="62" y="137" font-size="8" font-family="serif" fill="#7A4E0E" text-anchor="middle" transform="rotate(-12 62 134)">千万両</text>
+        <path d="M50 146 c4 6 12 7 18 3" fill="#FFFFFF" stroke="#2B2622" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <!-- head -->
+      <path d="M40 54 L44 18 L66 36 C74 33 86 33 94 36 L116 18 L120 54 C124 76 108 92 80 92 C52 92 36 76 40 54 Z" fill="url(#nk-b)" stroke="#2B2622" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M47 26 L50 44 L62 38 Z" fill="#F2A7A0"/>
+      <path d="M113 26 L110 44 L98 38 Z" fill="#F2A7A0"/>
+      <!-- calico patches -->
+      <path d="M92 36 C100 34 112 40 116 52 C108 50 98 46 92 36 Z" fill="#D98B3C" opacity=".9"/>
+      <path d="M44 48 C46 40 52 36 60 36 C56 42 50 46 44 48 Z" fill="#3A332D" opacity=".85"/>
+      <!-- face -->
+      <path d="M58 60 q6 -6 12 0" fill="none" stroke="#2B2622" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M90 60 q6 -6 12 0" fill="none" stroke="#2B2622" stroke-width="2.4" stroke-linecap="round"/>
+      <ellipse cx="56" cy="70" rx="6" ry="3.5" fill="#F2A7A0" opacity=".7"/>
+      <ellipse cx="104" cy="70" rx="6" ry="3.5" fill="#F2A7A0" opacity=".7"/>
+      <path d="M77 66 h6 l-3 3.5 Z" fill="#C9605A"/>
+      <path d="M80 70 q-3 5 -7 3 M80 70 q3 5 7 3" fill="none" stroke="#2B2622" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M40 64 l14 3 M40 72 l14 -1 M120 64 l-14 3 M120 72 l-14 -1" stroke="#2B2622" stroke-width="1.3" stroke-linecap="round" opacity=".7"/>
+      <!-- collar and bell -->
+      <path d="M50 86 C66 96 94 96 110 86" fill="none" stroke="#B4432E" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="80" cy="99" r="7.5" fill="url(#nk-g)" stroke="#8A5A12" stroke-width="1.6"/>
+      <path d="M73 98 h14" stroke="#8A5A12" stroke-width="1.2"/>
+      <circle cx="80" cy="102.5" r="1.6" fill="#8A5A12"/>
+    </svg>
     <h1 id="h">Zu Fuss durch Japan</h1>
     <p id="lead">Diese Seite ist privat. Gib das Passwort ein, das du bekommen hast.</p>
     <input id="pw" type="password" autocomplete="current-password" aria-label="Passwort" placeholder="Passwort" required>
@@ -47,7 +98,7 @@ button[disabled] { opacity: .6; }
               en: ["Walking across Japan", "This page is private. Enter the password you were given.", "Password", "Remember on this device", "Open", "That password isn't right.", "Deutsch", "Opening…"] };
   let lang = "de";
   const $ = (id) => document.getElementById(id);
-  function setLang(l) { lang = l; const t = T[l]; $("h").textContent = t[0]; $("lead").textContent = t[1]; $("pw").placeholder = t[2]; $("pw").setAttribute("aria-label", t[2]); $("remt").textContent = t[3]; $("go").textContent = t[4]; $("en").textContent = t[6]; document.documentElement.lang = l; }
+  function setLang(l) { lang = l; const t = T[l]; $("h").textContent = t[0]; $("lead").textContent = t[1]; $("pw").placeholder = t[2]; $("pw").setAttribute("aria-label", t[2]); $("remt").textContent = t[3]; $("go").textContent = t[4]; $("en").textContent = t[6]; $("neko").setAttribute("aria-label", l === "de" ? "Maneki-neko, die winkende Glückskatze" : "Maneki-neko, the beckoning lucky cat"); document.documentElement.lang = l; }
   $("en").addEventListener("click", (e) => { e.preventDefault(); setLang(lang === "de" ? "en" : "de"); });
   async function keyFrom(pw) {
     const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);

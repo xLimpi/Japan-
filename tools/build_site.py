@@ -51,7 +51,7 @@ inner = ('<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name=
          '<meta name="robots" content="noindex,nofollow"><title>Zu Fuss durch Japan</title></head><body>' + shim + page + "</body></html>")
 
 import hashlib
-digest = hashlib.sha256((inner + "|" + " ".join(assets) + "|" + (PW or "")).encode()).hexdigest()
+digest = hashlib.sha256((inner + "|" + " ".join(assets) + "|" + (PW or "") + "|" + open(os.path.join(HERE, "loader.html"), encoding="utf-8").read()).encode()).hexdigest()
 hp = os.path.join(OUT, ".build-hash")
 if os.path.exists(hp) and open(hp).read().strip() == digest and os.path.exists(os.path.join(OUT, "index.html")) and all(os.path.exists(os.path.join(OUT, "img", a + ".bin")) for a in assets):
     print("unchanged: nothing to publish"); sys.exit(0)

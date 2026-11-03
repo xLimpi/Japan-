@@ -48,7 +48,7 @@ let t=0;new MutationObserver(()=>{if(!t)t=setTimeout(()=>{t=0;fix();},30);}).obs
 </script>""" % json.dumps(store, ensure_ascii=False)
 
 inner = ('<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-         '<meta name="robots" content="noindex,nofollow"><title>Zu Fuss durch Japan</title></head><body>' + shim + page + "</body></html>")
+         '<meta name="robots" content="noindex,nofollow"><title>Zu Fuss durch Japan</title><link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Japan zu Fuss"><meta name="theme-color" content="#EEEDE8" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#13161B" media="(prefers-color-scheme: dark)"></head><body>' + shim + page + "</body></html>")
 
 import hashlib
 digest = hashlib.sha256((inner + "|" + " ".join(assets) + "|" + (PW or "") + "|" + open(os.path.join(HERE, "loader.html"), encoding="utf-8").read()).encode()).hexdigest()
@@ -62,7 +62,7 @@ for old in glob.glob(os.path.join(OUT, "img", "*.bin")):
 key = salt = None
 if PW:
     salt = b"sanyodo-friends-v1"  # fixed salt so a remembered key keeps working across rebuilds
-    key = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=ITER).derive(PW.encode())
+    key = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=ITER).derive(PW.strip().lower().encode())
 def enc(data):
     if not key: return data
     iv = os.urandom(12); return iv + AESGCM(key).encrypt(iv, data, None)

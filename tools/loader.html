@@ -6,6 +6,24 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
 <title>Zu Fuss durch Japan</title>
+<meta name="description" content="Raffaels Wanderungen durch Japan: Nakasendō, Tōkaidō und San'yōdō. Privat, mit Passwort.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Zu Fuss durch Japan">
+<meta property="og:title" content="Zu Fuss durch Japan">
+<meta property="og:description" content="Raffaels Wanderungen: Nakasendō, Tōkaidō und San'yōdō, von Kyoto bis Hiroshima. Privat, mit Passwort.">
+<meta property="og:url" content="https://xlimpi.github.io/Japan-/">
+<meta property="og:image" content="https://xlimpi.github.io/Japan-/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Aquarell: eine Glückskatze mit Strohhut und Wanderstab auf einer alten Landstrasse, dahinter der Fuji">
+<meta property="og:locale" content="de_CH">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F1E8D8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1C1A18" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-title" content="Japan zu Fuss">
 <script>try { const t = localStorage.getItem("jw-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}</script>
 <style>
 :root { --bg: #F1E8D8; --sheet: #FDF5E8; --ink: #2B2622; --ink2: #6B635A; --shu: #B4432E; --line: #DDD6C8; }
@@ -26,6 +44,16 @@ h1 { font: 600 22px/1.25 Georgia, "Times New Roman", serif; margin: 0 0 6px; }
 p { margin: 0 0 18px; color: var(--ink2); font-size: 14.5px; }
 input { width: 100%; font: inherit; padding: 11px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
 input:focus { outline: 2px solid var(--shu); outline-offset: 1px; }
+.pwwrap { position: relative; }
+.pwwrap input { padding-right: 46px; }
+.eye { all: unset; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; display: grid; place-items: center; color: var(--ink2); cursor: pointer; border-radius: 8px; }
+.eye:focus-visible { outline: 2px solid var(--shu); }
+.eye[aria-pressed="true"] .slash { display: none; }
+.card.opening .neko { animation: breathe 1.4s ease-in-out infinite; }
+@keyframes breathe { 0%, 100% { opacity: 1; transform: none; } 50% { opacity: .82; transform: scale(.985); } }
+@media (prefers-reduced-motion: reduce) { .card.opening .neko { animation: none; opacity: .85; } }
+.dots::after { content: ""; display: inline-block; width: 1.2em; text-align: left; animation: dots 1.2s steps(4) infinite; }
+@keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
 label.rem { display: flex; gap: 8px; align-items: center; justify-content: center; font-size: 13.5px; color: var(--ink2); margin: 12px 0 16px; }
 button { width: 100%; font: 600 15px/1 inherit; font-family: inherit; padding: 12px; border: 0; border-radius: 999px; background: var(--shu); color: #fff; cursor: pointer; }
 button[disabled] { opacity: .6; }
@@ -48,7 +76,10 @@ button[disabled] { opacity: .6; }
     </picture>
     <h1 id="h">Zu Fuss durch Japan</h1>
     <p id="lead">Diese Seite ist privat. Gib das Passwort ein, das du bekommen hast.</p>
-    <input id="pw" type="password" autocomplete="current-password" aria-label="Passwort" placeholder="Passwort" required>
+    <div class="pwwrap">
+      <input id="pw" type="password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Passwort" placeholder="Passwort" required>
+      <button type="button" class="eye" id="eye" aria-label="Passwort anzeigen" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/><path class="slash" d="M4 20 20 4"/></svg></button>
+    </div>
     <label class="rem"><input id="rem" type="checkbox" checked style="width:auto"> <span id="remt">Auf diesem Gerät merken</span></label>
     <button id="go" type="submit">Öffnen</button>
     <div class="err" id="err" role="alert"></div>
@@ -75,9 +106,10 @@ const TH_ICON = {
   $("themetog").addEventListener("click", () => { const n = isDark() ? "light" : "dark"; document.documentElement.dataset.theme = n; try { localStorage.setItem("jw-theme", n); } catch {} themeBtn(); });
   matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", themeBtn);
   themeBtn();
+  $("eye").addEventListener("click", () => { const on = $("pw").type === "password"; $("pw").type = on ? "text" : "password"; $("eye").setAttribute("aria-pressed", String(on)); $("eye").setAttribute("aria-label", on ? (lang === "de" ? "Passwort verbergen" : "Hide password") : (lang === "de" ? "Passwort anzeigen" : "Show password")); $("pw").focus(); });
   $("en").addEventListener("click", (e) => { e.preventDefault(); setLang(lang === "de" ? "en" : "de"); });
   async function keyFrom(pw) {
-    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(String(pw).trim().toLowerCase()), "PBKDF2", false, ["deriveKey"]);
     return crypto.subtle.deriveKey({ name: "PBKDF2", salt: b64(SALT), iterations: ITER, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, true, ["decrypt"]);
   }
   async function open(key) {
@@ -100,9 +132,10 @@ const TH_ICON = {
     $("pw").focus();
   })();
   $("f").addEventListener("submit", async (e) => {
-    e.preventDefault(); $("err").textContent = ""; $("go").disabled = true; $("go").textContent = T[lang][7];
+    e.preventDefault(); $("err").textContent = ""; $("go").disabled = true; $("go").innerHTML = `<span class="dots">${T[lang][7].replace(/…$/, "")}</span>`; $("f").classList.add("opening");
+    await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 30)));
     try { await tryKey(await keyFrom($("pw").value), $("rem").checked); }
-    catch { $("err").textContent = T[lang][5]; $("go").disabled = false; $("go").textContent = T[lang][4]; $("pw").select(); }
+    catch { $("f").classList.remove("opening"); $("err").textContent = T[lang][5]; $("go").disabled = false; $("go").textContent = T[lang][4]; $("pw").select(); }
   });
 })();
 </script>

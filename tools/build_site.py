@@ -7,6 +7,8 @@ Everything except --out is optional: whatever is not given is taken from the sit
 (its index.html is decrypted with the password and the page and data inside are reused).
   --bundle  the planner's "site bundle" asset (a PNG that carries the public data as bytes; its asset id is
             in the planner database, document public/bundle, field "asset"). Replaces the current journey's data.
+  --bundle-key  the "key" field of public/bundle; stored in OUT_DIR/.bundle-key once the site holds that
+            bundle, so the next run can stop early when the key has not changed.
   --page    the planner page (index.html of the artifact). Only needed when the page itself changed.
   --data    DATA_DIR/<collection>/<doc>.json files; these override single documents.
   --assets  ASSET_DIR/<asset id>.jpg (any image extension works) for photos not yet on the site;
@@ -27,7 +29,9 @@ except ImportError as e:
 HERE = os.path.dirname(os.path.abspath(__file__))
 arg = lambda k, d=None: sys.argv[sys.argv.index(k) + 1] if k in sys.argv else d
 OUT, PW = arg("--out"), arg("--password")
-PAGE, DATA, ASSETS, BUNDLE = arg("--page"), arg("--data"), arg("--assets", "assets"), arg("--bundle")
+PAGE, DATA, ASSETS, BUNDLE, BKEY = arg("--page"), arg("--data"), arg("--assets", "assets"), arg("--bundle"), arg("--bundle-key")
+def keep_key():
+    if BKEY and BUNDLE: open(os.path.join(OUT, ".bundle-key"), "w").write(BKEY.strip() + "\n")
 SALT = b"sanyodo-friends-v1"  # fixed salt so a remembered key keeps working across rebuilds
 ITER = 250000
 COLLS = ["public", "tracks", "j1tracks", "j3tracks", "weather", "j1weather", "j3weather"]
@@ -102,7 +106,7 @@ import hashlib
 digest = hashlib.sha256((inner + "|" + " ".join(assets) + "|" + (PW or "") + "|" + open(os.path.join(HERE, "loader.html"), encoding="utf-8").read()).encode()).hexdigest()
 hp = os.path.join(OUT, ".build-hash")
 if os.path.exists(hp) and open(hp).read().strip() == digest and os.path.exists(os.path.join(OUT, "index.html")) and all(os.path.exists(os.path.join(OUT, "img", a + ".bin")) for a in assets):
-    print("unchanged: nothing to publish"); sys.exit(0)
+    keep_key(); print("unchanged: nothing to publish"); sys.exit(0)
 os.makedirs(os.path.join(OUT, "img"), exist_ok=True)
 for old in glob.glob(os.path.join(OUT, "img", "*.bin")):
     if os.path.basename(old)[:-4] not in assets: os.remove(old)
@@ -137,3 +141,4 @@ open(os.path.join(OUT, "robots.txt"), "w").write("User-agent: *\nDisallow: /\n")
 open(os.path.join(OUT, ".nojekyll"), "w").write("")
 print("built", OUT, "photos", len(assets), "index", os.path.getsize(os.path.join(OUT, "index.html")))
 if missing: print("MISSING photo files (download these assets, then rebuild):", " ".join(missing)); sys.exit(2)
+keep_key()

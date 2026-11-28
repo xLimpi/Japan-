@@ -78,6 +78,17 @@ for c in COLLS if DATA else []:
     for fp in sorted(glob.glob(os.path.join(DATA, c, "*.json"))):
         d = json.load(open(fp, encoding="utf-8"))
         store[f"{c}/{os.path.basename(fp)[:-5]}"] = d.get("data", d) if isinstance(d, dict) and set(d) >= {"data", "id"} else d
+# drop duplicate uploads: same time taken and same position = same photo; keep the first upload
+dupes = []
+for k, v in list(store.items()):
+    if not k.startswith("public/") or not isinstance(v, dict) or not v.get("photos"): continue
+    seen, keep = {}, []
+    for p in sorted(v["photos"], key=lambda p: p.get("uploadedAt") or ""):
+        key = (p.get("takenAt"), p.get("lat"), p.get("lon"))
+        if p.get("takenAt") and key in seen: dupes.append(p["asset"]); continue
+        seen[key] = p["asset"]; keep.append(p)
+    v["photos"] = [p for p in v["photos"] if p in keep]
+if dupes: print("DUPLICATE photos left out:", " ".join(dupes))
 # photos friends may see = those in the public docs
 assets = sorted({p["asset"] for k, v in store.items() if k.startswith("public/") for p in (v.get("photos") or [])})
 

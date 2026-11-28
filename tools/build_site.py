@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the friends' website from the planner page and its public data.
 
-Usage: build_site.py --out OUT_DIR [--password PW] [--bundle BUNDLE.png] [--page PAGE.html] [--data DATA_DIR] [--assets ASSET_DIR]
+Usage: build_site.py --out OUT_DIR [--password PW] [--bundle BUNDLE.png] [--page PAGE.html] [--data DATA_DIR] [--assets ASSET_DIR] [--allow IDS.txt]
 
 Everything except --out is optional: whatever is not given is taken from the site already in OUT_DIR
 (its index.html is decrypted with the password and the page and data inside are reused).
@@ -30,6 +30,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 arg = lambda k, d=None: sys.argv[sys.argv.index(k) + 1] if k in sys.argv else d
 OUT, PW = arg("--out"), arg("--password")
 PAGE, DATA, ASSETS, BUNDLE, BKEY = arg("--page"), arg("--data"), arg("--assets", "assets"), arg("--bundle"), arg("--bundle-key")
+ALLOW = arg("--allow")  # file with one photo asset id per line: photos not listed are left out (deleted duplicates)
 def keep_key():
     if BKEY and BUNDLE: open(os.path.join(OUT, ".bundle-key"), "w").write(BKEY.strip() + "\n")
 SALT = b"sanyodo-friends-v1"  # fixed salt so a remembered key keeps working across rebuilds
@@ -78,17 +79,15 @@ for c in COLLS if DATA else []:
     for fp in sorted(glob.glob(os.path.join(DATA, c, "*.json"))):
         d = json.load(open(fp, encoding="utf-8"))
         store[f"{c}/{os.path.basename(fp)[:-5]}"] = d.get("data", d) if isinstance(d, dict) and set(d) >= {"data", "id"} else d
-# drop duplicate uploads: same time taken and same position = same photo; keep the first upload
-dupes = []
-for k, v in list(store.items()):
-    if not k.startswith("public/") or not isinstance(v, dict) or not v.get("photos"): continue
-    seen, keep = {}, []
-    for p in sorted(v["photos"], key=lambda p: p.get("uploadedAt") or ""):
-        key = (p.get("takenAt"), p.get("lat"), p.get("lon"))
-        if p.get("takenAt") and key in seen: dupes.append(p["asset"]); continue
-        seen[key] = p["asset"]; keep.append(p)
-    v["photos"] = [p for p in v["photos"] if p in keep]
-if dupes: print("DUPLICATE photos left out:", " ".join(dupes))
+# leave out current-journey photos that no longer exist in the planner (e.g. deleted duplicates)
+if ALLOW:
+    ok = {l.strip() for l in open(ALLOW, encoding="utf-8") if l.strip()}
+    gone = []
+    for k, v in list(store.items()):
+        if k == "public/trip" and isinstance(v, dict) and v.get("photos"):
+            gone += [p["asset"] for p in v["photos"] if p["asset"] not in ok]
+            v["photos"] = [p for p in v["photos"] if p["asset"] in ok]
+    if gone: print("LEFT OUT photos no longer in the planner:", " ".join(sorted(set(gone))))
 # photos friends may see = those in the public docs
 assets = sorted({p["asset"] for k, v in store.items() if k.startswith("public/") for p in (v.get("photos") or [])})
 
